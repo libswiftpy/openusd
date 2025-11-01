@@ -22,9 +22,6 @@ let package = Package(
                 .product(name: "OpenUSD", package: "SwiftUsd"),
                 "SwiftPy",
             ],
-            resources: [
-                .process("Resources")
-            ],
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
             ]

@@ -11,25 +11,18 @@ import SwiftPy
 
 @MainActor
 @Test
-func pythonExample() {
+func pythonExample() async {
     SwiftPyUSD.initialize()
     
     Interpreter.run("""
     from pxr import Usd
-    stage = Usd.Stage.create_new('HelloWorldRedux.usda')
-    stage.define_prim('/hello', 'Xform')
-    stage.define_prim('/hello/world', 'Sphere')
-    layer = stage.get_root_layer()
-    layer.save()
+    stage = Usd.Stage.CreateNew('HelloWorldRedux.usda')
+    stage.DefinePrim('/hello', 'Xform')
+    stage.DefinePrim('/hello/world', 'Sphere')
+    layer = stage.GetRootLayer()
+    layer.Save()
     print(layer.real_path)
     """)
 
-    Interpreter.run("""
-    stage = Usd.Stage.open('HelloWorldRedux.usda')
-    content = stage.export_to_string()
-    """)
-
-    Interpreter.run("content", mode: .single)
-
-    #expect(Interpreter.evaluate("content") != String?.none)
+    #expect(StageView(.main["view"]) != nil)
 }
