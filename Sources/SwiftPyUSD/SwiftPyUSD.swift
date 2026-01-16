@@ -11,6 +11,7 @@ public enum SwiftPyUSD {
     public static func initialize() {
         Interpreter.bindModule("pxr", [
             Usd.self,
+            UsdGeom.self,
             UsdUtils.self,
             Sdf.self,
         ])
