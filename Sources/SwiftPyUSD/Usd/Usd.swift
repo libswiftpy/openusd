@@ -11,10 +11,10 @@ import OpenUSD
 @MainActor
 @Scriptable(convertsToSnakeCase: false)
 public class Usd {
-    static let Stage: object? = UsdStage.pyType.object
-    static let Prim: object? = UsdPrim.pyType.object
-    static let References: object? = UsdReferences.pyType.object
-    static let Relationship: object? = UsdRelationship.pyType.object
+    static let Stage: object? = py.tpobject(UsdStage.pyType)
+    static let Prim: object? = py.tpobject(UsdPrim.pyType)
+    static let References: object? = py.tpobject(UsdReferences.pyType)
+    static let Relationship: object? = py.tpobject(UsdRelationship.pyType)
 }
 
 @Scriptable("Usd.Stage", convertsToSnakeCase: false)
@@ -24,8 +24,11 @@ public class UsdStage {
         Overlay.TfWeakPtr(stage)
     }
     
-    internal init(_ stage: pxr.UsdStageRefPtr) {
-        self.stage = Overlay.Dereference(stage)
+    internal init(_ stage: pxr.UsdStageRefPtr) throws {
+        guard let stage = Overlay.DereferenceOrNil(stage) else {
+            throw PythonError.AssertionError("Failed to create stage")
+        }
+        self.stage = stage
     }
     
     func DefinePrim(path: String, typeName: String = "") -> UsdPrim? {
@@ -41,8 +44,18 @@ public class UsdStage {
         return UsdPrim(prim)
     }
 
+    /// Traverse the active, loaded, defined, non-abstract prims on this stage depth-first.
+    func Traverse() -> [UsdPrim] {
+        stage.Traverse().compactMap(UsdPrim.init)
+    }
+
     func ExportToString() -> String? {
         stage.ExportToString()
+    }
+    
+    /// Calls SdfLayer.Save on all dirty layers contributing to this stage except session layers and sublayers of session layers.
+    func Save() {
+        stage.Save()
     }
 
     /// Returns the stage’s start timeCode.
@@ -74,16 +87,16 @@ public class UsdStage {
         SdfLayer(layer: stage.GetRootLayer())
     }
     
-    static func CreateNew(name: String) -> UsdStage? {
-        UsdStage(pxr.UsdStage.CreateNew(std.string(name)))
+    static func CreateNew(name: String) throws -> UsdStage? {
+        try UsdStage(pxr.UsdStage.CreateNew(std.string(name)))
     }
 
-    static func CreateInMemory() -> UsdStage? {
-        UsdStage(pxr.UsdStage.CreateInMemory())
+    static func CreateInMemory() throws -> UsdStage? {
+        try UsdStage(pxr.UsdStage.CreateInMemory())
     }
     
-    static func Open(name: String) -> UsdStage? {
-        UsdStage(pxr.UsdStage.Open(std.string(name)))
+    static func Open(name: String) throws -> UsdStage? {
+        try UsdStage(pxr.UsdStage.Open(std.string(name)))
     }
 }
 
@@ -95,18 +108,28 @@ extension UsdStage: CustomStringConvertible {
 
 @Scriptable("Usd.Prim", convertsToSnakeCase: false)
 public class UsdPrim: ObjectWrapper<pxr.UsdPrim> {
-    func GetPropertyNames() -> [String] {
+    /// Author ‘active’ metadata for this prim at the current EditTarget.
+    public func SetActive(_ value: Bool) -> Bool {
+        base.SetActive(value)
+    }
+    
+    /// Return the complete scene path to this object on its Stage.
+    public func GetPath() -> SdfPath {
+        SdfPath(base: base.GetPath())
+    }
+
+    public func GetPropertyNames() -> [String] {
         base.GetPropertyNames(Overlay.DefaultPropertyPredicateFunc)
             .map { token in
                 String(token.GetString())
             }
     }
 
-    func GetAttribute(name: String) -> UsdAttribute? {
+    public func GetAttribute(name: String) -> UsdAttribute? {
         UsdAttribute(base.GetAttribute(pxr.TfToken(name)))
     }
 
-    func GetReferences() -> UsdReferences {
+    public func GetReferences() -> UsdReferences {
         UsdReferences(base: base.GetReferences())
     }
 }

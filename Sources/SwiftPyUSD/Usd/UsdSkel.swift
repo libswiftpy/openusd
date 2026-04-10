@@ -11,12 +11,12 @@ import OpenUSD
 @Scriptable(convertsToSnakeCase: false)
 @MainActor
 public class UsdSkel {
-    static let Animation: object? = UsdSkelAnimation.pyType.object
-    static let BindingAPI: object? = UsdSkelBindingAPI.pyType.object
+    static let Animation: object? = UsdSkelAnimation.pyTypeObject
+    static let BindingAPI: object? = UsdSkelBindingAPI.pyTypeObject
 }
 
 @Scriptable("UsdSkel.Animation", convertsToSnakeCase: false)
-public class UsdSkelAnimation {
+public class UsdSkelAnimation: PythonConvertible {
     internal var base: pxr.UsdSkelAnimation
     
     internal init(base: pxr.UsdSkelAnimation) {
@@ -45,7 +45,7 @@ public class UsdSkelAnimation {
 
 /// Provides API for authoring and extracting all the skinning-related data that lives in the “geometry hierarchy” of prims and models that want to be skeletally deformed.
 @Scriptable("UsdSkel.BindingAPI", convertsToSnakeCase: false)
-class UsdSkelBindingAPI {
+class UsdSkelBindingAPI: PythonConvertible {
     internal let base: pxr.UsdSkelBindingAPI
     
     internal init(base: pxr.UsdSkelBindingAPI) {

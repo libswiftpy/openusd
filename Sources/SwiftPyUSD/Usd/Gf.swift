@@ -9,11 +9,11 @@ import SwiftPy
 
 @Scriptable(convertsToSnakeCase: false)
 final class Gf: PythonBindable {
-    static let Vec3d: object? = GfVec3d.pyType.object
+    static let Vec3d: object? = GfVec3d.pyTypeObject
 }
 
 @Scriptable("Gf.Vec3d", convertsToSnakeCase: false)
-final class GfVec3d {
+final class GfVec3d: PythonConvertible {
     internal let base: pxr.GfVec3d
     
     init(x: Double, y: Double, z: Double) {

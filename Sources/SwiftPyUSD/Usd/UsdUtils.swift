@@ -10,7 +10,8 @@ import OpenUSD
 
 @Scriptable(convertsToSnakeCase: false)
 final class UsdUtils {
-    static func CreateNewARKitUsdzPackage(assetPath: SdfAssetPath, outputPath: String, layerName: String) {
-        pxr.UsdUtilsCreateNewARKitUsdzPackage(assetPath.base, std.string(outputPath), std.string(layerName))
+    static func CreateNewARKitUsdzPackage(assetPath: String, outputPath: String, layerName: String = "Root") -> Bool {
+        let assetPath = SdfAssetPath(path: assetPath)
+        return pxr.UsdUtilsCreateNewARKitUsdzPackage(assetPath.base, std.string(outputPath), std.string(layerName))
     }
 }

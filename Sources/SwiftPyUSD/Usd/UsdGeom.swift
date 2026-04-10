@@ -11,10 +11,10 @@ import OpenUSD
 @MainActor
 @Scriptable(convertsToSnakeCase: false)
 final class UsdGeom {
-    static let Xform: object? = UsdGeomXform.pyType.object
-    static let Sphere: object? = UsdGeomSphere.pyType.object
-    static let Tokens: object? = UsdGeomTokens.pyType.object
-    static let Xformable: object? = UsdGeomXformable.pyType.object
+    static let Xform: object? = UsdGeomXform.pyTypeObject
+    static let Sphere: object? = UsdGeomSphere.pyTypeObject
+    static let Tokens: object? = UsdGeomTokens.pyTypeObject
+    static let Xformable: object? = UsdGeomXformable.pyTypeObject
 
     /// Author stage's metersPerUnit. Returns True if metersPerUnit was successfully set.
     static func SetStageMetersPerUnit(stage: UsdStage, metersPerUnit: Double) -> Bool {
@@ -28,13 +28,13 @@ final class UsdGeom {
 }
 
 @Scriptable("UsdGeom.Tokens")
-class UsdGeomTokens {
+class UsdGeomTokens: PythonConvertible {
     static let y = String(pxr.TfToken.UsdGeomTokens.y.GetString())
     static let z = String(pxr.TfToken.UsdGeomTokens.z.GetString())
 }
 
 @Scriptable("UsdGeom.Xform", convertsToSnakeCase: false)
-final class UsdGeomXform {
+final class UsdGeomXform: PythonConvertible {
     internal let base: pxr.UsdGeomXform
 
     internal init(base: pxr.UsdGeomXform) {
@@ -48,7 +48,7 @@ final class UsdGeomXform {
 }
 
 @Scriptable("UsdGeom.Xformable", convertsToSnakeCase: false)
-final class UsdGeomXformable {
+final class UsdGeomXformable: PythonConvertible {
     internal let base: pxr.UsdGeomXformable
     
     init(prim: UsdPrim) {
@@ -70,7 +70,7 @@ final class UsdGeomXformable {
 }
 
 @Scriptable("UsdGeom.XformOp", convertsToSnakeCase: false)
-final class UsdGeomXformOp {
+final class UsdGeomXformOp: PythonConvertible {
     internal let base: pxr.UsdGeomXformOp
 
     internal init(base: pxr.UsdGeomXformOp) {
@@ -83,7 +83,7 @@ final class UsdGeomXformOp {
 }
 
 @Scriptable("UsdGeom.Sphere", convertsToSnakeCase: false)
-final class UsdGeomSphere {
+final class UsdGeomSphere: PythonConvertible {
     internal let base: pxr.UsdGeomSphere
 
     internal init(base: pxr.UsdGeomSphere) {

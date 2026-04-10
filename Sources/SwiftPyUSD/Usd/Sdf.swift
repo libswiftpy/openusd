@@ -11,9 +11,9 @@ import OpenUSD
 @MainActor
 @Scriptable(convertsToSnakeCase: false)
 final class Sdf: PythonBindable {
-    static let Path: object? = SdfPath.pyType.object
-    static let AssetPath: object? = SdfAssetPath.pyType.object
-    static let Layer: object? = SdfLayer.pyType.object
+    static let Path: object? = py.tpobject(SdfPath.pyType)
+    static let AssetPath: object? = py.tpobject(SdfAssetPath.pyType)
+    static let Layer: object? = py.tpobject(SdfLayer.pyType)
 }
 
 @Scriptable("Sdf.AssetPath", convertsToSnakeCase: false)
@@ -26,7 +26,7 @@ final class SdfAssetPath {
 }
 
 @Scriptable("Sdf.Path", convertsToSnakeCase: false)
-final class SdfPath {
+public final class SdfPath {
     internal let base: pxr.SdfPath
 
     internal init(base: pxr.SdfPath) {
@@ -35,6 +35,17 @@ final class SdfPath {
 
     init(path: String) {
         self.base = pxr.SdfPath(std.string(path))
+    }
+
+    /// Return the string representation of this path.
+    public func GetAsString() -> String {
+        String(base.GetAsString())
+    }
+}
+
+extension SdfPath: CustomStringConvertible {
+    public var description: String {
+        GetAsString()
     }
 }
 
