@@ -107,7 +107,8 @@ extension UsdStage: CustomStringConvertible {
 }
 
 @Scriptable("Usd.Prim", convertsToSnakeCase: false)
-public class UsdPrim: ObjectWrapper<pxr.UsdPrim> {
+@MainActor
+public class UsdPrim: ObjectWrapper<pxr.UsdPrim>, Sendable {
     /// Author ‘active’ metadata for this prim at the current EditTarget.
     public func SetActive(_ value: Bool) -> Bool {
         base.SetActive(value)
@@ -125,6 +126,12 @@ public class UsdPrim: ObjectWrapper<pxr.UsdPrim> {
             }
     }
 
+    public func CreateAttribute(name: String, typeName: SdfValueTypeName, custom: Bool = true, variability: SdfVariability? = nil) -> UsdAttribute? {
+        let variability = variability ?? Sdf.VariabilityVarying
+        let attribute = base.CreateAttribute(pxr.TfToken(name), typeName.base, custom, variability.base)
+        return UsdAttribute(attribute)
+    }
+    
     public func GetAttribute(name: String) -> UsdAttribute? {
         UsdAttribute(base.GetAttribute(pxr.TfToken(name)))
     }

@@ -8,13 +8,40 @@
 import SwiftPy
 import OpenUSD
 
-@MainActor
 @Scriptable(convertsToSnakeCase: false)
-final class Sdf: PythonBindable {
+@MainActor
+public final class Sdf: PythonBindable {
     static let Path: object? = py.tpobject(SdfPath.pyType)
     static let AssetPath: object? = py.tpobject(SdfAssetPath.pyType)
     static let Layer: object? = py.tpobject(SdfLayer.pyType)
     static let TimeCode: object? = SdfTimeCode.pyTypeObject
+    static let ValueTypeNames: object? = SdfValueTypeNames.pyTypeObject
+    
+    static let VariabilityUniform: SdfVariability = SdfVariability(base: pxr.SdfVariabilityUniform)
+    static let VariabilityVarying: SdfVariability = SdfVariability(base: pxr.SdfVariabilityVarying)
+}
+
+@Scriptable
+public class SdfVariability {
+    internal let base: pxr.SdfVariability
+
+    internal init(base: pxr.SdfVariability) {
+        self.base = base
+    }
+}
+
+@Scriptable("Sdf.ValueTypeName", convertsToSnakeCase: false)
+public class SdfValueTypeName: PythonConvertible {
+    internal let base: pxr.SdfValueTypeName
+    
+    internal init(_ base: pxr.SdfValueTypeName) {
+        self.base = base
+    }
+}
+
+@Scriptable("Sdf.ValueTypeNames", convertsToSnakeCase: false)
+public class SdfValueTypeNames: PythonConvertible {
+    static let Asset: SdfValueTypeName = SdfValueTypeName(.Asset)
 }
 
 @Scriptable("Sdf.TimeCode", convertsToSnakeCase: false)
@@ -57,7 +84,7 @@ public final class SdfPath {
     }
 }
 
-extension SdfPath: CustomStringConvertible {
+extension SdfPath: @MainActor CustomStringConvertible {
     public var description: String {
         GetAsString()
     }
