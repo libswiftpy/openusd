@@ -12,7 +12,15 @@ import OpenUSD
 public class Vt {}
 
 extension [String] {
-    func vtArray() -> pxr.VtTokenArray {
+    func vtStringArray() -> pxr.VtStringArray {
+        var array = pxr.VtStringArray()
+        for element in self {
+            array.push_back(std.string(element))
+        }
+        return array
+    }
+    
+    func vtTokenArray() -> pxr.VtTokenArray {
         var array = pxr.VtTokenArray()
         for element in self {
             array.push_back(pxr.TfToken(element))

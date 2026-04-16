@@ -139,6 +139,11 @@ public class UsdPrim: ObjectWrapper<pxr.UsdPrim>, Sendable {
     public func GetReferences() -> UsdReferences {
         UsdReferences(base: base.GetReferences())
     }
+    
+    public func CreateRelationship(name: String, custom: Bool = true) -> UsdRelationship? {
+        let relationship = base.CreateRelationship(pxr.TfToken(name), custom)
+        return UsdRelationship(relationship)
+    }
 }
 
 @Scriptable("Usd.Attribute", convertsToSnakeCase: false)
@@ -148,8 +153,8 @@ public class UsdAttribute: ObjectWrapper<pxr.UsdAttribute>, Sendable {
         throw PythonError.NotImplementedError("UsdAttribute.Get is not implemented")
     }
 
-    func GetTypeName() {
-        base.GetTypeName()
+    func GetTypeName() -> SdfValueTypeName {
+        SdfValueTypeName(base.GetTypeName())
     }
     
     func Set(value: object, timecode: Int? = nil) -> Bool {
@@ -159,26 +164,49 @@ public class UsdAttribute: ObjectWrapper<pxr.UsdAttribute>, Sendable {
             pxr.UsdTimeCode.Default()
         }
 
-        if let array = [Float](value) {
-            return base.Set(pxr.VtValue(array.vtArray()), timecode)
-        }
+        let vtValue: pxr.VtValue? = {
+            switch base.GetTypeName() {
+            case .Asset:
+                if let path = SdfAssetPath(value) {
+                    return pxr.VtValue(path.base)
+                }
 
-        if let assetPath = SdfAssetPath(value) {
-            return base.Set(pxr.VtValue(assetPath.base), timecode)
-        }
+                if let str = String(value) {
+                    return pxr.VtValue(pxr.SdfAssetPath(str))
+                }
+                
+            case .TimeCode:
+                if let timeCode = SdfTimeCode(value) {
+                    return pxr.VtValue(timeCode.base)
+                }
 
-        if let tc = SdfTimeCode(value) {
-            return base.Set(pxr.VtValue(tc.base), timecode)
-        }
+                if value.canCast(to: .float) {
+                    return pxr.VtValue(pxr.SdfTimeCode(py.castfloat(value)))
+                }
+                
+            case .Token:
+                if let str = String(value) {
+                    return pxr.VtValue(pxr.TfToken(str))
+                }
+                
+            case .FloatArray:
+                if let array = [Float](value) {
+                    return pxr.VtValue(array.vtArray())
+                }
+
+            case .StringArray:
+                if let array = [String](value) {
+                    return pxr.VtValue(array.vtStringArray())
+                }
+                
+            default: break
+            }
+
+            return nil
+        }()
         
-        // TODO: Detect base type
-        if let str = String(value) {
-            return base.Set(pxr.VtValue(pxr.TfToken(str)), timecode)
-        }
-
-        // TODO: Detect base type
-        if let int = Int(value) {
-            return base.Set(pxr.VtValue(pxr.SdfTimeCode(Double(int))), timecode)
+        if let vtValue, base.Set(vtValue, timecode) {
+            return true
         }
         
         return false
@@ -200,13 +228,7 @@ public class UsdReferences {
 
 /// A UsdRelationship creates dependencies between scenegraph objects by allowing a prim to target other prims, attributes, or relationships.
 @Scriptable("Usd.Relationship", convertsToSnakeCase: false)
-public class UsdRelationship {
-    internal var base: pxr.UsdRelationship
-
-    internal init(base: pxr.UsdRelationship) {
-        self.base = base
-    }
-
+public class UsdRelationship: ObjectWrapper<pxr.UsdRelationship> {
     /// Make the authoring layer’s opinion of the targets list explicit, and set exactly to targets
     func SetTargets(targets: [SdfPath]) -> Bool {
         var vector = pxr.SdfPathVector()
@@ -223,6 +245,7 @@ public protocol UsdObject {
 
 extension pxr.UsdAttribute: UsdObject {}
 extension pxr.UsdPrim: UsdObject {}
+extension pxr.UsdRelationship: UsdObject {}
 
 public class ObjectWrapper<T: UsdObject> {
     let base: T

@@ -39,9 +39,18 @@ public class SdfValueTypeName: PythonConvertible {
     }
 }
 
+extension SdfValueTypeName: @MainActor CustomStringConvertible {
+    public var description: String {
+        String(describing: base)
+    }
+}
+
 @Scriptable("Sdf.ValueTypeNames", convertsToSnakeCase: false)
 public class SdfValueTypeNames: PythonConvertible {
     static let Asset: SdfValueTypeName = SdfValueTypeName(.Asset)
+    static let TimeCode: SdfValueTypeName = SdfValueTypeName(.TimeCode)
+    static let StringArray: SdfValueTypeName = SdfValueTypeName(.StringArray)
+    static let Token: SdfValueTypeName = SdfValueTypeName(.Token)
 }
 
 @Scriptable("Sdf.TimeCode", convertsToSnakeCase: false)

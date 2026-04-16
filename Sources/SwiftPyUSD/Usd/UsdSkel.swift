@@ -24,7 +24,7 @@ public class UsdSkelAnimation: PythonConvertible {
     }
     
     func CreateBlendShapesAttr(attributes: [String]) -> UsdAttribute? {
-        let array = attributes.vtArray()
+        let array = attributes.vtTokenArray()
         let attrib = base.CreateBlendShapesAttr(pxr.VtValue(array))
         return UsdAttribute(attrib)
     }
@@ -53,8 +53,8 @@ class UsdSkelBindingAPI: PythonConvertible {
     }
 
     /// Creates an animation source to be bound to Skeleton primitives at or beneath the location at which this property is defined.
-    func CreateAnimationSourceRel() -> UsdRelationship {
-        UsdRelationship(base: base.CreateAnimationSourceRel())
+    func CreateAnimationSourceRel() -> UsdRelationship? {
+        UsdRelationship(base.CreateAnimationSourceRel())
     }
     
     /// Applies this single-apply API schema to the given prim.
