@@ -64,6 +64,17 @@ let package = Package(
         ),
 
         .target(
+            name: "UsdSkel",
+            dependencies: [
+                "pxr",
+                "SwiftPy",
+                "Usd",
+                "Sdf",
+            ],
+            swiftSettings: [.interoperabilityMode(.Cxx)]
+        ),
+
+        .target(
             name: "UsdUtils",
             dependencies: [
                 "pxr",
@@ -82,6 +93,7 @@ let package = Package(
                 "Sdf",
                 "Usd",
                 "UsdMedia",
+                "UsdSkel",
                 "UsdUtils",
             ],
             swiftSettings: [.interoperabilityMode(.Cxx)]

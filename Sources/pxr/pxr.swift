@@ -37,7 +37,13 @@ public typealias UsdRelationship = pxr.UsdRelationship
 public typealias UsdTimeCode = pxr.UsdTimeCode
 
 // MARK: - UsdMedia
+
 public typealias UsdMediaSpatialAudio = pxr.UsdMediaSpatialAudio
+
+// MARK: - UsdSkel
+
+public typealias UsdSkelAnimation = pxr.UsdSkelAnimation
+public typealias UsdSkelBindingAPI = pxr.UsdSkelBindingAPI
 
 // MARK: - UsdUtils
 

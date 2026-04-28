@@ -31,11 +31,11 @@ public class SpatialAudio: ClassWrapper<pxr.UsdMediaSpatialAudio> {
         return Usd.Attribute(value: attribute)
     }
     
-    /// Attempt to ensure a Prim adhering to this schema at \p path
-    /// is defined (according to UsdPrim::IsDefined()) on this stage.
+    /// Ensure a SpatialAudio prim is defined at the given path on the provided stage.
     public static func Define(stage: Usd.Stage, path: Sdf.Path) throws(PythonError) -> SpatialAudio {
         let ptr = PxrOverlay.TfWeakPtr(stage.value)
         let audio = pxr.UsdMediaSpatialAudio.Define(ptr, path.value)
         return SpatialAudio(value: audio)
     }
 }
+
